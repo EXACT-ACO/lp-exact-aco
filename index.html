@@ -81,7 +81,10 @@ src="https://www.facebook.com/tr?id=1489433913199448&ev=PageView&noscript=1"
   --mono:'SFMono-Regular',Consolas,Menlo,monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scroll-snap-type:y proximity}
+/* Ímã suave: rolagem livre, mas ao parar perto do início de uma seção
+   a página encaixa sozinha. proximity (não mandatory) = nunca trava o usuário. */
+.hero,section{scroll-snap-align:start}
 body{font-family:'Mont',system-ui,sans-serif;background:var(--carbon);color:var(--bone);-webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden}
 img{max-width:100%;display:block}
 a{color:inherit}
@@ -333,7 +336,7 @@ footer{padding:60px 0 36px;border-top:1px solid var(--line);font-size:12.5px;col
   .hero-bg,.cinema-bg,.final-bg,.ch-media img,.ch-media video{transform:none!important}
   .hero-bg video{display:none}
   .hero-shine{display:none}
-  html{scroll-behavior:auto}
+  html{scroll-behavior:auto;scroll-snap-type:none}
 }
 </style>
 </head>
