@@ -198,21 +198,29 @@ body.menu-open{overflow:hidden}
 .cinema h2{font-size:clamp(30px,5.2vw,72px);max-width:20ch;margin:0 auto 20px}
 .cinema .body{max-width:52ch;margin:0 auto}
 
-/* ---------- COMPARATIVO ANTES/DEPOIS (arraste) ---------- */
-.split{padding:clamp(110px,16vh,180px) 0;background:var(--graphite);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.slider{position:relative;overflow:hidden;aspect-ratio:16/9;cursor:ew-resize;user-select:none;border:1px solid var(--line);background:#111;margin-top:clamp(36px,6vh,60px)}
-@media(max-width:700px){.slider{aspect-ratio:4/5}}
-.sl-img{position:absolute;inset:0;background-size:cover;background-position:center}
-.sl-a{background-image:url('assets/img/antes_canteiro.jpg')}
-.sl-b{background-image:url('assets/img/canteiro_limpo.jpg');clip-path:inset(0 0 0 50%)}
-.sl-lab{position:absolute;bottom:22px;z-index:4;font-family:'SpaceG','Mont',sans-serif;font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#fff;background:rgba(10,10,12,.72);backdrop-filter:blur(8px);padding:10px 16px;pointer-events:none}
-.sl-la{left:22px}
-.sl-lb{right:22px;background:rgba(70,108,169,.85)}
-.handle{position:absolute;top:0;bottom:0;left:50%;width:1.5px;background:var(--bone);z-index:5;pointer-events:none;box-shadow:0 0 18px rgba(0,0,0,.6)}
-.handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:var(--bone);box-shadow:0 8px 26px rgba(0,0,0,.5)}
-.handle::before{content:'‹ ›';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;font-size:17px;font-weight:700;color:var(--carbon);letter-spacing:2px}
-.sl-hint{text-align:center;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--steel);margin-top:18px}
-@media(max-width:640px){.sl-lab{font-size:9px;padding:8px 10px;bottom:14px}.sl-la{left:12px}.sl-lb{right:12px}}
+/* ---------- NOSSOS PRODUTOS (abas 01/02 com transição) ---------- */
+.produtos{padding:clamp(110px,16vh,180px) 0;background:var(--graphite);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ptabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);margin:clamp(30px,5vh,50px) 0 clamp(30px,4vh,44px)}
+.ptab{display:flex;align-items:baseline;gap:14px;padding:20px clamp(16px,2.4vw,30px);background:transparent;border:0;border-right:1px solid var(--line);cursor:pointer;text-align:left;transition:.35s;font-family:'SpaceG','Mont',sans-serif}
+.ptab:last-child{border-right:0}
+.ptab i{font-style:normal;font-weight:300;font-size:clamp(20px,2.4vw,30px);color:var(--steel);transition:.35s}
+.ptab span{font-size:clamp(11px,1.4vw,15px);font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--steel);transition:.35s}
+.ptab:hover span{color:var(--bone2)}
+.ptab.on{background:rgba(236,234,228,.05);box-shadow:inset 0 -2px 0 var(--ice)}
+.ptab.on i{color:var(--ice)}
+.ptab.on span{color:#fff}
+.ppanels{display:grid}
+.ppanel{grid-area:1/1;display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,80px);align-items:center;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .55s ease,transform .55s ease}
+.ppanel.on{opacity:1;transform:none;pointer-events:auto}
+@media(max-width:880px){.ppanel{grid-template-columns:1fr;align-items:start}}
+.pmedia{overflow:hidden;aspect-ratio:4/3;border:1px solid var(--line)}
+.pmedia img{width:100%;height:100%;object-fit:cover;display:block}
+.pkicker{font-family:'SpaceG','Mont',sans-serif;font-size:11px;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--ice);margin:26px 0 6px}
+.plist{list-style:none}
+.plist li{padding:12px 0 12px 26px;border-bottom:1px solid var(--line);font-size:clamp(13px,1.4vw,14.5px);font-weight:300;color:var(--bone2);position:relative;line-height:1.55}
+.plist li:last-child{border-bottom:0}
+.plist li::before{content:'»';position:absolute;left:0;color:var(--ice);font-weight:600}
+.phint{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--steel);margin-top:22px;text-align:center}
 
 /* ---------- POR QUE A EXACT (diferenciais) ---------- */
 .why{background:var(--graphite);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(110px,16vh,180px) 0;position:relative;overflow:hidden}
@@ -340,7 +348,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <img src="assets/img/logo_branco_c.png" alt="Exact Aço">
     <nav>
       <a href="#precisao">Precisão</a>
-      <a href="#limpeza">Canteiro</a>
+      <a href="#produtos">Produtos</a>
       <a href="#previsibilidade">Preço</a>
       <a href="#porque">Por que a Exact</a>
       <a href="#obras">Obras</a>
@@ -356,7 +364,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <div class="mnav" id="mnav">
   <a href="#precisao">Precisão</a>
-  <a href="#limpeza">Canteiro</a>
+  <a href="#produtos">Produtos</a>
   <a href="#previsibilidade">Preço</a>
   <a href="#porque">Por que a Exact</a>
   <a href="#obras">Obras</a>
@@ -405,19 +413,48 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
-<!-- ================= CANTEIRO: ANTES x DEPOIS ================= -->
-<section class="split" id="limpeza">
+<!-- ================= NOSSOS PRODUTOS ================= -->
+<section class="produtos" id="produtos">
   <div class="wrap">
-    <div class="ch-head rv"><span class="ch-n">02</span><h2 class="display">Do caos ao canteiro limpo</h2></div>
-    <p class="body rv" style="max-width:58ch">Com o corte e dobra da Exact, <b>11% do aço deixa de virar ponta no chão</b> e a obra ganha <b>até 25% menos horas de armador</b>. Sem bancada, sem policorte, sem faísca — sobra espaço, silêncio e cronograma. <b>Arraste e compare.</b></p>
-    <div class="slider rv" id="sl">
-      <div class="sl-img sl-a"></div>
-      <div class="sl-img sl-b" id="slb"></div>
-      <div class="sl-lab sl-la">Corte no canteiro</div>
-      <div class="sl-lab sl-lb">Com a Exact</div>
-      <div class="handle" id="hnd"></div>
+    <div class="ch-head rv"><span class="ch-n">02</span><h2 class="display">Nossos produtos</h2></div>
+    <p class="body rv" style="max-width:56ch">Duas formas de tirar a ferragem do seu caminho. <b>Clique e veja o que a sua obra ganha</b> com cada uma.</p>
+
+    <div class="ptabs rv" role="tablist">
+      <button class="ptab on" type="button" data-p="0" role="tab" aria-selected="true"><i>01</i><span>Aço cortado e dobrado</span></button>
+      <button class="ptab" type="button" data-p="1" role="tab" aria-selected="false"><i>02</i><span>Aço armado</span></button>
     </div>
-    <div class="sl-hint rv">Arraste a alça para comparar</div>
+
+    <div class="ppanels rv">
+      <div class="ppanel on">
+        <div class="pmedia"><img src="assets/img/ia_cd_hq.jpg" alt="Vergalhões cortados e dobrados em kits identificados" loading="lazy"></div>
+        <div>
+          <p class="body">Vergalhões CA-50 e CA-60 cortados e dobrados conforme o seu projeto estrutural, entregues em <b>kits identificados</b> e prontos para montagem e amarração.</p>
+          <div class="pkicker">O que sua obra ganha</div>
+          <ul class="plist">
+            <li><b>Economia de tempo</b> — kits prontos, separados por elemento e ordem de execução</li>
+            <li><b>Desperdício zero</b> — otimização das barras dentro da fábrica</li>
+            <li>Canteiro limpo e seguro, sem estoque de barras de 12 metros</li>
+            <li>Redução de custo com mão de obra de armação</li>
+            <li>Produção conforme a NBR 7480</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ppanel">
+        <div class="pmedia"><img src="assets/img/gaiolas.jpg" alt="Armaduras prontas fabricadas com precisão industrial" loading="lazy"></div>
+        <div>
+          <p class="body">Vigas, pilares, sapatas e estacas chegam à obra com a <b>armadura pronta</b>: fabricadas com precisão industrial e liberadas para içar, posicionar e concretar.</p>
+          <div class="pkicker">O que sua obra ganha</div>
+          <ul class="plist">
+            <li><b>Rapidez na execução</b> — a ferragem chega pronta para uso</li>
+            <li>Menos mão de obra e menos retrabalho no canteiro</li>
+            <li>Maior rigidez e precisão dimensional das armaduras</li>
+            <li>Controle de qualidade industrial peça a peça</li>
+            <li>Engenharia própria analisa cada projeto individualmente</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="phint rv">Clique nas abas para ver as especificações de cada produto</div>
   </div>
 </section>
 
@@ -658,22 +695,21 @@ frame();
   setTimeout(on, 10000); /* segurança: liga mesmo se o vídeo não disparar 'ended' */
 })();
 
-/* ---------- SLIDER ANTES/DEPOIS ---------- */
+/* ---------- NOSSOS PRODUTOS: abas com alternância automática ---------- */
 (function(){
-  var sl=document.getElementById('sl'), b=document.getElementById('slb'), h=document.getElementById('hnd'), drag=false, fired=false;
-  function set(x){
-    var r=sl.getBoundingClientRect();
-    var p=Math.max(2,Math.min(98,(x-r.left)/r.width*100));
-    b.style.clipPath='inset(0 0 0 '+p+'%)'; h.style.left=p+'%';
-    if(!fired){fired=true;track('slider_drag',{});}
+  var tabs=[].slice.call(document.querySelectorAll('.ptab')),
+      panels=[].slice.call(document.querySelectorAll('.ppanel')),
+      cur=0, timer=null,
+      red=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function show(i,user){
+    cur=i;
+    tabs.forEach(function(t,k){ t.classList.toggle('on',k===i); t.setAttribute('aria-selected',k===i?'true':'false'); });
+    panels.forEach(function(p,k){ p.classList.toggle('on',k===i); });
+    if(user && timer){ clearInterval(timer); timer=null; } /* usuário assumiu o controle */
+    if(user) track('produto_tab',{p:i===0?'corte_dobra':'armado'});
   }
-  function down(e){drag=true; set((e.touches?e.touches[0]:e).clientX); e.preventDefault();}
-  function move(e){if(drag) set((e.touches?e.touches[0]:e).clientX);}
-  function up(){drag=false;}
-  sl.addEventListener('mousedown',down); sl.addEventListener('touchstart',down,{passive:false});
-  addEventListener('mousemove',move); addEventListener('touchmove',move,{passive:true});
-  addEventListener('mouseup',up); addEventListener('touchend',up);
-  sl.addEventListener('click',function(e){ if(!drag) set(e.clientX); });
+  tabs.forEach(function(t,i){ t.addEventListener('click',function(){ show(i,true); }); });
+  if(!red){ timer=setInterval(function(){ show((cur+1)%panels.length,false); },7000); } /* alterna sozinho até o 1º clique */
 })();
 
 /* ---------- MENU MOBILE ---------- */
