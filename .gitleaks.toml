@@ -1,0 +1,23 @@
+title = "gitleaks — lp-exact-aco"
+
+# Config do secret scan (.github/workflows/gitleaks.yml).
+#
+# Padrão copiado de parisgroup-ai/exact-aco: regras default do gitleaks
+# (`useDefault`) mais allowlists MEDIDAS, cada uma com o porquê. Allowlist sem
+# medição registrada aqui não entra.
+#
+# Medição de 04/08/2026 (gitleaks 8.30.1, 16 commits):
+#   - `gitleaks dir` (working tree, incluindo node_modules): ZERO achados
+#   - `gitleaks git` (histórico completo):                    ZERO achados
+#
+# Por isso este arquivo não tem NENHUMA allowlist hoje — o repo nasce limpo e
+# o gate nasce bloqueante sem exceção. Se o gitleaks acusar algo aqui um dia:
+#   - segredo real   → remover do commit (rebase/amend) + ROTACIONAR; se já
+#                      estiver no histórico da main, allowlist por COMMIT (não
+#                      por path — path deixaria o arquivo cego pra segredo
+#                      novo), com comentário e depois da rotação;
+#   - falso positivo → allowlist escopada ao literal exato (regexTarget =
+#                      "match"), nunca ao arquivo inteiro, com comentário.
+
+[extend]
+useDefault = true
