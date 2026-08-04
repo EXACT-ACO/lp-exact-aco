@@ -1,0 +1,200 @@
+name: gitleaks
+
+# Secret scan — gate de PR + varredura semanal do histórico.
+#
+# Padrão copiado de parisgroup-ai/exact-aco (repo privado de outra org). Lá o
+# scan usa um workflow REUTILIZÁVEL da infra (parisgroup-ai/infra), que este
+# repo não consegue referenciar — então o passo baixa o CLI do gitleaks direto
+# do GitHub Releases, com versão E sha256 pinados. Sem licença paga da
+# `gitleaks-action`. As regras ficam no `.gitleaks.toml` da raiz.
+#
+# Três modos, de propósito:
+#
+#   PR   → só os commits do PR (base..head). É o gate que bloqueia merge e
+#          precisa ser rápido (~segundos). Não re-escaneia o passado, então o
+#          tempo de CI não cresce com a idade do repo.
+#   push → último commit da main: rede de segurança pro que entra fora de PR.
+#   cron → histórico inteiro, semanal. Quando acha algo, o job `abrir-issue`
+#          abre issue de rastreio (ou comenta na aberta — sem duplicar), no
+#          mesmo padrão do notify-ci-red do CI do closeu. Medição de 04/08:
+#          histórico inteiro dá ZERO — se um dia der vermelho, é achado novo.
+#          Obs.: o GitHub desliga cron de repo sem atividade por 60 dias; o
+#          workflow_dispatch fica como acionamento manual.
+#
+# Todo output usa `--redact`: o VALOR do segredo nunca aparece em log, resumo
+# ou issue — só regra + arquivo + linha + commit.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # Segunda 06:00 UTC (03:00 BRT) — antes de o time começar.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+# Push novo no mesmo PR cancela o run antigo. Na main/cron NUNCA cancela: um
+# run cancelado não reporta falha e o abrir-issue perderia o evento.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: secret-scan (gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      resumo: ${{ steps.scan.outputs.resumo }}
+    steps:
+      # fetch-depth 0 porque o range base..head do PR precisa dos dois lados no
+      # clone (shallow morre em "bad object" no --log-opts) e o cron escaneia o
+      # histórico inteiro (~16 commits hoje — instantâneo).
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Baixar gitleaks (versão e sha256 pinados)
+        env:
+          GITLEAKS_VERSION: "8.30.1"
+          GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+        run: |
+          set -euo pipefail
+          curl -sSfL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          chmod +x gitleaks
+
+      # Anti-injection: contexto do GitHub entra por env: e é lido como
+      # variável de shell, nunca interpolado direto no run:.
+      - name: Secret scan
+        id: scan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          common=(--redact --no-banner --config .gitleaks.toml \
+                  --report-format json --report-path report.json)
+
+          case "$EVENT_NAME" in
+            pull_request)
+              echo "Modo: git-pr-range (${PR_BASE_SHA:0:7}..${PR_HEAD_SHA:0:7})"
+              set +e
+              ./gitleaks git --log-opts="${PR_BASE_SHA}..${PR_HEAD_SHA}" "${common[@]}" .
+              rc=$?
+              set -e
+              ;;
+            push)
+              echo "Modo: git-last (último commit da main)"
+              set +e
+              ./gitleaks git --log-opts="-1" "${common[@]}" .
+              rc=$?
+              set -e
+              ;;
+            schedule|workflow_dispatch)
+              echo "Modo: git-full (histórico completo)"
+              set +e
+              ./gitleaks git "${common[@]}" .
+              rc=$?
+              set -e
+              ;;
+            *)
+              echo "::error::Evento inesperado: $EVENT_NAME"
+              exit 1
+              ;;
+          esac
+
+          # gitleaks: 0 = limpo, 1 = achou segredo, resto = erro de execução.
+          if [ "$rc" -eq 0 ]; then
+            echo "Nenhum segredo encontrado."
+            exit 0
+          fi
+          if [ "$rc" -ne 1 ]; then
+            echo "::error::gitleaks falhou com código $rc (erro de execução, não achado)"
+            exit "$rc"
+          fi
+
+          # Achou. Resumo SÓ com regra+arquivo+linha+commit — o valor nunca
+          # aparece (--redact redige o log e o report).
+          n=$(jq length report.json)
+          {
+            echo "## gitleaks: ${n} possível(is) segredo(s)"
+            echo ""
+            echo "| Regra | Arquivo | Linha | Commit |"
+            echo "|---|---|---|---|"
+            jq -r '.[] | "| \(.RuleID) | `\(.File)` | \(.StartLine) | \(.Commit[0:7]) |"' report.json
+            echo ""
+            echo "O valor do segredo não aparece aqui nem no log (\`--redact\`)."
+            echo "Se for segredo real: remova do commit (rebase/amend) e ROTACIONE a credencial."
+            echo "Se for falso positivo: allowlist no \`.gitleaks.toml\`, escopada e comentada."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          {
+            echo "resumo<<RESUMO_EOF"
+            echo "| Regra | Arquivo | Linha | Commit |"
+            echo "|---|---|---|---|"
+            jq -r '.[] | "| \(.RuleID) | `\(.File)` | \(.StartLine) | \(.Commit[0:7]) |"' report.json
+            echo "RESUMO_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "::error::gitleaks encontrou ${n} possível(is) segredo(s) — veja o resumo do job (valores redigidos)"
+          exit 1
+
+  # Abre (ou comenta em) uma issue de rastreio quando a varredura AGENDADA do
+  # histórico acha algo. Mesmo padrão do notify-ci-red do CI do closeu: label
+  # fixa, dedupe por issue aberta, contexto via env (anti-injection).
+  abrir-issue:
+    name: Abrir issue quando a varredura semanal achar segredo
+    needs: [scan]
+    if: ${{ always() && needs.scan.result == 'failure' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SERVER_URL: ${{ github.server_url }}
+      RUN_ID: ${{ github.run_id }}
+      LABEL: gitleaks-red
+      RESUMO: ${{ needs.scan.outputs.resumo }}
+    steps:
+      - name: Garantir que a label existe
+        run: |
+          gh label create "$LABEL" \
+            --repo "$REPO" \
+            --color b60205 \
+            --description "Segredo detectado no historico - rotacionar antes de fechar" \
+            --force
+
+      - name: Abrir issue (ou comentar na que já está aberta)
+        run: |
+          set -euo pipefail
+
+          RUN_URL="${SERVER_URL}/${REPO}/actions/runs/${RUN_ID}"
+
+          EXISTING=$(gh issue list --repo "$REPO" --label "$LABEL" --state open --json number --jq '.[0].number // empty')
+
+          if [ -n "$EXISTING" ]; then
+            echo "Issue $LABEL #$EXISTING já aberta — comentando nela."
+            printf 'Varredura semanal continua achando segredo no histórico — %s\n\n%s\n' \
+              "$RUN_URL" "$RESUMO" > comment.md
+            gh issue comment "$EXISTING" --repo "$REPO" --body-file comment.md
+          else
+            echo "Abrindo issue $LABEL nova."
+            printf '## Varredura semanal do gitleaks achou segredo no histórico\n\n- **Run**: %s\n\n%s\n\nOs VALORES estão redigidos (`--redact`) — o log mostra só regra + arquivo + linha + commit.\n\n**O que fazer**: identifique o segredo no commit apontado; se for real, ROTACIONE a credencial no provedor (o valor continua exposto no histórico do git para sempre) e depois allowliste o commit no `.gitleaks.toml` (por COMMIT, não por path, com comentário). Se for falso positivo, allowlist escopada e comentada. Feche esta issue só depois disso — varreduras seguintes comentam aqui (não abrem issue duplicada).\n' \
+              "$RUN_URL" "$RESUMO" > body.md
+            gh issue create \
+              --repo "$REPO" \
+              --title "[gitleaks] Segredo detectado no histórico pela varredura semanal" \
+              --label "$LABEL" \
+              --body-file body.md
+          fi
