@@ -3,3 +3,6 @@ node_modules/
 npm-debug.log*
 .env
 .env.local
+
+# corpus do ordoplugin (symlink local para o clone de parisgroup-ai/ordoplugin)
+.claude/ordoplugin-corpus

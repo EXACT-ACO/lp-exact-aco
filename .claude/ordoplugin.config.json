@@ -1,0 +1,7 @@
+{
+  "framework": "plain-html",
+  "output_target": "index.html",
+  "corpus_path": ".claude/ordoplugin-corpus",
+  "marketing_dir": "marketing",
+  "note": "Corpus é symlink para clone local de parisgroup-ai/ordoplugin (não versionado). Skills/docs copiados de src/commands/ordoplugin e src/docs."
+}

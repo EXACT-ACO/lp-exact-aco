@@ -1,0 +1,111 @@
+{
+  "_meta": {
+    "primary_reference": "linear",
+    "secondary_reference": "offbrand",
+    "industrial_calibration": ["nucor", "gerdau"],
+    "design_system_inheritance": "Herda do Linear (raw-extract): escala de títulos com tracking -0.022em, body 15-16px com -0.011em/lh 1.6, pesos não-padrão 510/590 (Space Grotesk variável), transição dominante 0.16s cubic-bezier(0.25,0.46,0.45,0.94) em 7 propriedades nos botões, micro-stack de sombra do botão primário, seções assimétricas 96px/128px, container 1344px+46px, prose 624px, sistema de z-layers completo, header fixo com blur 20px e border hairline. Cross-pollination Off Brand: display uppercase gigante com line-height 1.0, hierarquia por tamanho, reveal lento 1.2s quart-out cubic-bezier(0.165,0.84,0.44,1), tabela numerada (Por que a Exact). Calibração industrial (Nucor/Gerdau): radius 0 hard-edge (override deliberado sobre o pill do Linear — estética de especificação/engenharia do setor), barra vertical de accent nos títulos de seção, CTA uppercase com seta em caixa 1px, navy como tom nativo do aço BR. Overrides de marca: paleta ancorada no navy #2c2858 (logo/propostas Exact) deslocando os neutros do Linear para cast navy, mantendo as MESMAS relações de contraste; tipografia da marca mantida (Space Grotesk display + Mont corpo, já auto-hospedadas); accent único azul-gelo #8fb0e8 (aço) da linguagem atual da LP; font-features cv01/ss03 do Inter não se aplicam ao Mont (omitido)."
+  },
+  "color": {
+    "ink": "#f7f8f8",
+    "bg": "#08080f",
+    "bg_marketing": "#060609",
+    "surface": "#0f1019",
+    "surface_2": "#151527",
+    "panel": "#10101c",
+    "accent": "#8fb0e8",
+    "accent_tint": "#1b1b33",
+    "brand_navy": "#2c2858",
+    "text_secondary": "#d0d6e0",
+    "muted": "#8a8f98",
+    "muted_2": "#62666d",
+    "border": "#23253a",
+    "border_translucent": "rgba(255,255,255,0.06)",
+    "whatsapp": "#25D366"
+  },
+  "type": {
+    "display": "'SpaceG' (Space Grotesk variável 300-700, auto-hospedada)",
+    "body": "'Mont' (300/400/600/700, auto-hospedada)",
+    "mono": "'SFMono-Regular', Consolas, Menlo, monospace"
+  },
+  "scale": {
+    "h1_px": 72,
+    "h1_clamp": "clamp(40px, 6vw, 72px)",
+    "h2_px": 48,
+    "h2_clamp": "clamp(30px, 4vw, 48px)",
+    "h3_px": 20,
+    "eyebrow_px": 11,
+    "body_px": 15.5,
+    "body_lg_px": 17,
+    "stat_px": 56,
+    "stat_clamp": "clamp(34px, 4.2vw, 56px)"
+  },
+  "tracking": {
+    "display_em": -0.022,
+    "h2_em": -0.022,
+    "h3_em": -0.012,
+    "body_em": -0.011,
+    "eyebrow_em": 0.18
+  },
+  "line_height": {
+    "display_ratio": 1.0,
+    "h2_ratio": 1.04,
+    "body_ratio": 1.6
+  },
+  "weight": {
+    "regular": 400,
+    "medium": 510,
+    "semibold": 590,
+    "bold": 700,
+    "body_light": 300,
+    "comment": "510/590 são os pesos não-padrão do Linear, aplicados via Space Grotesk variável (300-700). Mont corpo usa 300/400/600."
+  },
+  "radius": {
+    "small_px": 0,
+    "med_px": 0,
+    "large_px": 0,
+    "pill_px": 0,
+    "float_whatsapp_px": 9999,
+    "comment": "Hard-edge 0 (calibração industrial Nucor + identidade atual da LP). Única exceção: botão flutuante do WhatsApp (pill funcional, já existente)."
+  },
+  "shadow": {
+    "low": "0px 2px 4px rgba(0,0,0,0.1)",
+    "medium": "0px 4px 24px rgba(0,0,0,0.2)",
+    "high": "0px 7px 32px rgba(0,0,0,0.35)",
+    "stack_low_inset_micro": "0px 8px 2px 0px rgba(0,0,0,0), 0px 5px 2px 0px rgba(0,0,0,0.01), 0px 3px 2px 0px rgba(0,0,0,0.04), 0px 1px 1px 0px rgba(0,0,0,0.07), 0px 0px 1px 0px rgba(0,0,0,0.08)"
+  },
+  "motion": {
+    "duration_quick": "0.1s",
+    "duration_standard": "0.16s",
+    "duration_surface": "0.4s",
+    "duration_slow": "1.2s",
+    "ease_default": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "ease_emphasis": "cubic-bezier(0.165, 0.84, 0.44, 1)",
+    "button_transition": "border 0.16s, background-color 0.16s, color 0.16s, box-shadow 0.16s, opacity 0.16s, filter 0.16s, transform 0.16s — todas com ease_default (7 propriedades simultâneas, assinatura Linear)"
+  },
+  "container": {
+    "max_px": 1344,
+    "prose_max_px": 624,
+    "gutter": "clamp(24px, 4vw, 46px)"
+  },
+  "section_padding": {
+    "py_top_px": 96,
+    "py_bottom_px": 128,
+    "asymmetric": true,
+    "hero_top": "clamp(72px, 12vh, 140px)"
+  },
+  "z_layers": {
+    "footer": 50,
+    "header": 100,
+    "float": 120,
+    "menu_overlay": 500,
+    "skip_nav": 5000,
+    "max": 10000
+  },
+  "header": {
+    "height_px": 72,
+    "blur_px": 20,
+    "bg": "rgba(8,8,15,0.8)",
+    "border": "rgba(255,255,255,0.08)"
+  },
+  "font_features": "normal"
+}
