@@ -67,11 +67,11 @@ src="https://www.facebook.com/tr?id=1489433913199448&ev=PageView&noscript=1"
      Eventos custom via track(): cta_whatsapp, form_submit, produto_tab, scroll_50, scroll_90 -->
 
 <style>
-@font-face{font-family:'Mont';src:url('assets/fonts/MontF-300.ttf') format('truetype');font-weight:300;font-display:swap}
-@font-face{font-family:'Mont';src:url('assets/fonts/MontF-400.ttf') format('truetype');font-weight:400;font-display:swap}
-@font-face{font-family:'Mont';src:url('assets/fonts/MontF-600.ttf') format('truetype');font-weight:600;font-display:swap}
-@font-face{font-family:'Mont';src:url('assets/fonts/MontF-700.ttf') format('truetype');font-weight:700;font-display:swap}
-@font-face{font-family:'SpaceG';src:url('assets/fonts/SpaceGrotesk.ttf') format('truetype');font-weight:300 700;font-display:swap}
+@font-face{font-family:'Mont';src:url('assets/fonts/MontF-300.woff2') format('woff2');font-weight:300;font-display:swap}
+@font-face{font-family:'Mont';src:url('assets/fonts/MontF-400.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Mont';src:url('assets/fonts/MontF-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Mont';src:url('assets/fonts/MontF-700.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'SpaceG';src:url('assets/fonts/SpaceGrotesk.woff2') format('woff2');font-weight:300 700;font-display:swap}
 
 :root{
   --carbon:#0a0a0c; --graphite:#131318; --panel:#18181f;
@@ -138,7 +138,7 @@ body.menu-open{overflow:hidden}
 
 /* ---------- HERO ---------- */
 .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden}
-.hero-bg{position:absolute;inset:-12% 0;background:url('assets/img/gen/g_macro_dark.png') center/cover;will-change:transform}
+.hero-bg{position:absolute;inset:-12% 0;background:url('assets/img/gen/g_macro_dark.webp') center/cover;will-change:transform}
 .hero-bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
 /* ---------- BRILHO VARRENDO O AÇO (liga após a animação) ---------- */
@@ -289,7 +289,7 @@ details[open] summary::after{transform:rotate(45deg)}
 
 /* ---------- CTA FINAL ---------- */
 .final{position:relative;min-height:92svh;display:flex;align-items:center;overflow:hidden}
-.final-bg{position:absolute;inset:-12% 0;background:url('assets/img/fim_bg.jpg') center/cover;will-change:transform}
+.final-bg{position:absolute;inset:-12% 0;background:url('assets/img/fim_bg.webp') center/cover;will-change:transform}
 .final::after{content:'';position:absolute;inset:0;background:rgba(10,10,12,.78)}
 .final .wrap{position:relative;z-index:2}
 .fgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(40px,6vw,90px);align-items:center}
@@ -467,7 +467,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <header id="hdr">
   <div class="wrap hd">
-    <img src="assets/img/logo_branco_c.png" alt="Exact Aço">
+    <img src="assets/img/logo_branco_c.webp" alt="Exact Aço">
     <nav>
       <a href="#precisao">Precisão</a>
       <a href="#produtos">Produtos</a>
@@ -496,11 +496,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ================= HERO ================= -->
 <section class="hero">
   <div class="hero-bg" data-plx="-.18">
-    <video id="heroVid" src="assets/img/gen/g_hero_fall.mp4" autoplay muted playsinline preload="auto" poster="assets/img/gen/g_macro_dark.png" aria-hidden="true"></video>
+    <video id="heroVid" src="assets/img/gen/g_hero_fall.mp4" autoplay muted playsinline preload="auto" poster="assets/img/gen/g_macro_dark.webp" aria-hidden="true"></video>
     <div class="hero-shine" id="heroShine"></div>
   </div>
   <div class="wrap">
-    <img class="hero-logo rv" src="assets/img/logo_branco_c.png" alt="Exact Aço">
+    <img class="hero-logo rv" src="assets/img/logo_branco_c.webp" alt="Exact Aço">
     <div class="eyebrow rv">Chapecó/SC · desde 2018</div>
     <h1 class="display rv">Cronograma em dia.<br>Sem dor de cabeça.</h1>
     <p class="body rv">Corte, dobra e ferragens armadas entregues <b>no dia em que a sua obra pede</b> — com precisão de fábrica, peça por peça identificada e preço travado.</p>
@@ -514,7 +514,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ================= CAP 01 — PRECISÃO (vídeo em tela cheia) ================= -->
 <section class="chapter fullbg" id="precisao">
-  <div class="fbg"><video src="assets/img/gen/g_cage_spin.mp4" autoplay muted loop playsinline poster="assets/img/gen/g_cage_dark.png" aria-hidden="true"></video></div>
+  <div class="fbg"><video data-src="assets/img/gen/g_cage_spin.mp4" muted loop playsinline preload="none" poster="assets/img/gen/g_cage_dark.webp" aria-hidden="true"></video></div>
   <div class="wrap">
     <div class="ch-head rv"><span class="ch-n">01</span><h2 class="display">Precisão</h2></div>
     <div class="overlay-copy rv">
@@ -534,8 +534,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ================= NOSSOS PRODUTOS (fundo troca com a aba) ================= -->
 <section class="produtos fullbg" id="produtos">
   <div class="fbg">
-    <div class="bgimg on" style="background-image:url(assets/img/gen/p_corte_dobra_dark.png);background-position:center bottom"></div>
-    <div class="bgimg" style="background-image:url(assets/img/gen/p_armado_dark.png)"></div>
+    <div class="bgimg on" style="background-image:url(assets/img/gen/p_corte_dobra_dark.webp);background-position:center bottom"></div>
+    <div class="bgimg" style="background-image:url(assets/img/gen/p_armado_dark.webp)"></div>
   </div>
   <div class="wrap">
     <div class="ch-head rv"><span class="ch-n">02</span><h2 class="display">Nossos produtos</h2></div>
@@ -579,7 +579,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ================= POR QUE A EXACT ================= -->
 <section class="why" id="porque">
-  <div class="sbg" style="background-image:url(assets/img/gen/sede_corner_dark.png)"></div>
+  <div class="sbg" style="background-image:url(assets/img/gen/sede_corner_dark.webp)"></div>
   <div class="wrap">
     <div class="ch-head rv"><span class="ch-n">03</span><h2 class="display">Por que escolher a Exact?</h2></div>
     <p class="body rv" style="max-width:54ch">Não é mais um fornecedor de aço na cotação. É a etapa inteira de ferragem saindo do seu caminho — com cinco compromissos que os concorrentes não assumem.</p>
@@ -610,7 +610,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ================= CAP 03 — PREÇO E PREVISIBILIDADE (tela cheia) ================= -->
 <section class="chapter fullbg" id="previsibilidade">
-  <div class="fbg"><div class="bgimg on" style="background-image:url(assets/img/gen/g_bobinas_dark.png)"></div></div>
+  <div class="fbg"><div class="bgimg on" style="background-image:url(assets/img/gen/g_bobinas_dark.webp)"></div></div>
   <div class="wrap">
     <div class="ch-head rv"><span class="ch-n">04</span><h2 class="display">Preço e previsibilidade</h2></div>
     <div class="overlay-copy rv">
@@ -630,7 +630,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ================= OBRAS ================= -->
 <section class="obras" id="obras">
-  <div class="sbg" style="background-image:url(assets/img/gen/sede_side_dark.png)"></div>
+  <div class="sbg" style="background-image:url(assets/img/gen/sede_side_dark.webp)"></div>
   <div class="wrap">
     <div class="ch-head rv"><span class="ch-n">05</span><h2 class="display">Obra recorrente</h2></div>
     <p class="body rv" style="max-width:56ch;margin-bottom:44px">Pedido avulso qualquer um consegue. A gente mede se está entregando pelo cliente que <b>volta na próxima obra</b>.</p>
@@ -729,7 +729,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="wrap">
     <div class="ft">
       <div>
-        <img src="assets/img/logo_branco_c.png" alt="Exact Aço">
+        <img src="assets/img/logo_branco_c.webp" alt="Exact Aço" loading="lazy">
         <p style="max-width:36ch">Aço na medida exata para a sua obra. Indústria de corte, dobra e ferragens armadas sob medida, em Chapecó/SC, desde 2018.</p>
       </div>
       <div>
@@ -882,6 +882,23 @@ document.querySelectorAll('.rv').forEach(function(el,i){ el.style.transitionDela
 
 /* ---------- VÍDEO DO PILAR (respeita reduced motion) ---------- */
 if(reduce){ document.querySelectorAll('video').forEach(function(v){ v.pause(); v.removeAttribute('autoplay'); }); }
+
+/* ---------- VÍDEO DO PILAR: só baixa quando a seção se aproxima (poster segura o visual) ---------- */
+(function(){
+  var lazies=[].slice.call(document.querySelectorAll('video[data-src]'));
+  if(!lazies.length) return;
+  function load(v){
+    if(v.src) return;
+    v.src=v.dataset.src;
+    v.load();
+    if(!reduce){ var p=v.play(); if(p&&p.catch) p.catch(function(){}); }
+  }
+  if(!('IntersectionObserver' in window)){ lazies.forEach(load); return; }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ load(e.target); io.unobserve(e.target); } });
+  },{rootMargin:'600px 0px'});
+  lazies.forEach(function(v){ io.observe(v); });
+})();
 
 /* ---------- CONTADORES "SCORE" (sobem quando entram na tela) ---------- */
 (function(){
