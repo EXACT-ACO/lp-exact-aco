@@ -758,12 +758,62 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </a>
 
 <script>
+/* ---------- ATRIBUIÇÃO: de onde o visitante veio (pro CRM medir campanhas) ----------
+   Guarda no navegador o PRIMEIRO acesso e o ÚLTIMO acesso com origem (UTM,
+   clique do Google/Meta ou outro site). Visita direta não apaga a origem
+   anterior. Vai junto com o formulário e com o clique no WhatsApp. */
+var exactAttr=(function(){
+  var KF='exact_attr_first', KL='exact_attr_last';
+  function ls(k,v){ try{ if(v===undefined) return JSON.parse(localStorage.getItem(k)||'null'); localStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; } }
+  function cookie(n){ var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)')); return m?decodeURIComponent(m[1]):undefined; }
+  var q=new URLSearchParams(location.search), t={};
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','gbraid','wbraid','fbclid'].forEach(function(k){ var v=q.get(k); if(v) t[k]=v.slice(0,300); });
+  var ref='';
+  try{ if(document.referrer && new URL(document.referrer).hostname!==location.hostname) ref=document.referrer.slice(0,1000); }catch(e){}
+  if(ref) t.referrer=ref;
+  t.landing_path=location.pathname.slice(0,300);
+  t.ts=new Date().toISOString();
+  var temOrigem=Object.keys(t).some(function(k){ return k!=='landing_path'&&k!=='ts'; });
+  if(!ls(KF)) ls(KF,t);
+  if(temOrigem||!ls(KL)) ls(KL,t);
+  var memoria={first:t,last:t};
+  return function(){
+    /* _fbc/_fbp são do Pixel da Meta: lidos na hora (o Pixel grava depois do load). */
+    var u=Object.assign({},ls(KL)||memoria.last), p=Object.assign({},ls(KF)||memoria.first);
+    var fbc=cookie('_fbc'), fbp=cookie('_fbp');
+    if(fbc) u.fbc=fbc; if(fbp) u.fbp=fbp;
+    return {ultimo:u,primeiro:p};
+  };
+})();
+
 var WPP='554931993164';
 var MSG='Ola! Vim pelo site da Exact Aco. Quero enviar o projeto da minha obra para orcamento de corte e dobra / ferragem armada.';
+/* Código curto por clique (EX-XXXX): vai no fim da mensagem do WhatsApp e é
+   registrado no CRM com a origem. O SDR digita o código ao cadastrar o lead
+   e a campanha fica ligada à venda. Sem 0/O/1/I pra não confundir. */
+function refCode(){
+  var A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s='', r=new Uint8Array(4);
+  (window.crypto||window.msCrypto).getRandomValues(r);
+  for(var i=0;i<4;i++) s+=A[r[i]%A.length];
+  return 'EX-'+s;
+}
+function registrarCliqueWa(ref,ctx){
+  var body=JSON.stringify({ref:ref,cta:ctx,atribuicao:exactAttr()});
+  try{
+    if(navigator.sendBeacon && navigator.sendBeacon('/api/wa-click',new Blob([body],{type:'application/json'}))) return;
+  }catch(e){}
+  try{ fetch('/api/wa-click',{method:'POST',headers:{'content-type':'application/json'},body:body,keepalive:true}); }catch(e){}
+}
 document.querySelectorAll('.wa').forEach(function(a){
   a.href='https://wa.me/'+WPP+'?text='+encodeURIComponent(MSG);
   a.target='_blank'; a.rel='noopener';
-  a.addEventListener('click',function(){ track('cta_whatsapp',{ctx:a.dataset.ctx||'na'}); });
+  a.addEventListener('click',function(){
+    var ctx=a.dataset.ctx||'na', ref=refCode();
+    /* troca o link ANTES da navegação: a mensagem já sai com o código */
+    a.href='https://wa.me/'+WPP+'?text='+encodeURIComponent(MSG+'\n\n(Código do site: '+ref+')');
+    registrarCliqueWa(ref,ctx);
+    track('cta_whatsapp',{ctx:ctx});
+  });
 });
 
 /* ---------- PARALLAX + ZOOM DE IMAGENS (rAF) ---------- */
@@ -951,7 +1001,8 @@ function waHref(d){
     var d=Object.fromEntries(new FormData(form));
     d.nome=(d.nome||'').trim(); d.empresa=(d.empresa||'').trim(); d.telefone=(d.telefone||'').trim();
     if(!d.nome||!d.empresa||!d.telefone){ alert('Preencha nome, empresa e telefone.'); return; }
-    track('form_submit',d);
+    /* Sem dados pessoais (nome/telefone/e-mail) pro Meta/Google: só o evento. */
+    track('form_submit',{});
     var btn=form.querySelector('button[type=submit]');
     if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
     var wa=waHref(d);
@@ -965,7 +1016,7 @@ function waHref(d){
       var b=document.getElementById('waDone');
       if(b) b.addEventListener('click',function(){ track('cta_whatsapp',{ctx:'pos_form'}); });
     }
-    fetch('/api/lead',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(d)})
+    fetch('/api/lead',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.assign({},d,{atribuicao:exactAttr()}))})
       .then(function(r){ track('lead_'+(r.ok?'ok':'fail'),{status:r.status}); })
       .catch(function(){ track('lead_fail',{status:0}); })
       .finally(confirmar); /* mostra o painel + WhatsApp mesmo se o CRM falhar — nunca perde o lead */

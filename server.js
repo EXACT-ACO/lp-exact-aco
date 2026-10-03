@@ -8,6 +8,8 @@
  *      (closeu), injetando o segredo de ingestão do lado servidor. O segredo
  *      NUNCA vai pro browser (por isso o proxy) e, como a chamada CRM é
  *      server-to-server, não há CORS envolvido.
+ *   3. POST /api/wa-click — registra no CRM o clique no WhatsApp (código
+ *      EX-XXXX + origem da visita), pra medir as campanhas. Mesmo proxy.
  *
  * Env:
  *   PORT               porta (Railway injeta)
@@ -35,6 +37,60 @@ app.use((_req, res, next) => {
 });
 
 app.get("/healthz", (_req, res) => res.json({ ok: true }));
+
+// ---- Atribuição de marketing (UTM, clique do Google/Meta, site de origem) ----
+// Só as chaves conhecidas, texto curto. O CRM revalida (tolerante).
+const ATTR_KEYS = [
+  "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+  "gclid", "gbraid", "wbraid", "fbclid", "fbc", "fbp",
+  "referrer", "landing_path", "ts",
+];
+function cleanToque(t) {
+  if (!t || typeof t !== "object") return undefined;
+  const out = {};
+  for (const k of ATTR_KEYS) {
+    const v = t[k];
+    if (typeof v === "string" && v.trim()) out[k] = v.trim().slice(0, k === "referrer" ? 1000 : 300);
+  }
+  return out;
+}
+function cleanAtribuicao(a) {
+  if (!a || typeof a !== "object") return undefined;
+  return { ultimo: cleanToque(a.ultimo), primeiro: cleanToque(a.primeiro) };
+}
+
+// URL do CRM pro clique no WhatsApp: mesmo endpoint base do lead + /whatsapp-click.
+const CRM_WA_CLICK_URL = CRM_LEAD_URL ? CRM_LEAD_URL.replace(/\/+$/, "") + "/whatsapp-click" : null;
+const REF_RE = /^EX-[A-HJ-NP-Z2-9]{4}$/;
+
+// ---- Clique no WhatsApp → proxy pro CRM (best-effort; o visitante já foi pro WhatsApp) ----
+app.post("/api/wa-click", express.json({ limit: "16kb", type: () => true }), async (req, res) => {
+  const b = req.body || {};
+  const ref = typeof b.ref === "string" ? b.ref.trim().toUpperCase() : "";
+  if (!REF_RE.test(ref)) return res.status(400).json({ ok: false });
+  if (!CRM_WA_CLICK_URL || !LP_INGEST_SECRET) return res.status(503).json({ ok: false });
+  try {
+    const r = await fetch(CRM_WA_CLICK_URL, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${LP_INGEST_SECRET}`,
+        "x-forwarded-for": (req.headers["x-forwarded-for"] || req.ip || "").toString(),
+      },
+      body: JSON.stringify({
+        ref,
+        cta: typeof b.cta === "string" ? b.cta.slice(0, 40) : undefined,
+        atribuicao: cleanAtribuicao(b.atribuicao),
+      }),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!r.ok) console.error("[lp] wa-click: CRM respondeu %d", r.status);
+    return res.status(r.ok ? 200 : 502).json({ ok: r.ok });
+  } catch (e) {
+    console.error("[lp] wa-click: erro ao chamar o CRM:", e && e.message ? e.message : e);
+    return res.status(502).json({ ok: false });
+  }
+});
 
 // ---- Captura de lead → proxy pro CRM ----
 app.post("/api/lead", express.json({ limit: "32kb" }), async (req, res) => {
@@ -69,9 +125,9 @@ app.post("/api/lead", express.json({ limit: "32kb" }), async (req, res) => {
       headers: {
         "content-type": "application/json",
         authorization: `Bearer ${LP_INGEST_SECRET}`,
-        "x-forwarded-for": (req.headers["x-forwarded-for"] || "").toString(),
+        "x-forwarded-for": (req.headers["x-forwarded-for"] || req.ip || "").toString(),
       },
-      body: JSON.stringify(lead),
+      body: JSON.stringify({ ...lead, atribuicao: cleanAtribuicao(b.atribuicao) }),
       signal: AbortSignal.timeout(8000),
     });
     if (!r.ok) {
